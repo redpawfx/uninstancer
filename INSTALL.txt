@@ -1,0 +1,64 @@
+NimbleTools for Maya 2008 and up
+================================
+
+www.NimbleStudiosInc.com
+info@NimbleStudiosInc.com
+
+INSTALLATION FOR WINDOWS AND LINUX
+
+1. Extract NimbleTools_py.zip to the directory of your choice
+
+2. Open NimbleTools.txt in a text editor and change PATH_TO_INSTALL_DIRECTORY
+   to point the NimbleTools directory.
+
+   Ex (Windows):
+   If C:/MyExtraPlugins/NimbleTools contains the extracted icons/, plug-ins/,
+   and scripts/ directories, edit NimbleTools.txt to look like:
+
++ NimbleTools 1.2 C:/MyExtraPlugins/NimbleTools
+
+   Ex (Linux):
+   If /opt/NimbleTools contains the extracted icons/, plug-ins/, and scripts/
+   directories, edit NimbleTools.txt to look like:
+
++ NimbleTools 1.2 /opt/NimbleTools
+
+3. Copy NimbleTools.txt into the 'modules' directory found either in your
+   your local Maya preferences directory or in the Maya installation directory.
+
+   On Windows, for Maya 2008, this is by default: 
+   C:\Documents and Settings\<username>\My Documents\maya\2008\modules
+   or
+   C:\Program Files\Autodesk\Maya2008\modules
+
+   On Linux, for Maya 2008, this is by default: 
+   ~<username>/maya/2008/modules/
+   or
+   /usr/autodesk/maya2008/modules/
+   
+   If the modules directory does not exist, create it.
+   
+4. Launch Maya and load the "NimbleTools.py" plugin from the Plug-in Manager.
+
+
+INSTALLATION FOR MAC
+
+1. Extract NimbleTools_py.zip to the directory of your choice
+
+2. Open NimbleTools.txt in a text editor and change PATH_TO_INSTALL_DIRECTORY
+   to point the NimbleTools directory.
+
+   Ex:
+   If /Users/username/Documents/nimbletools contains the extracted icons/,
+   plug-ins/, and scripts/ directories, edit NimbleTools.txt to look like:
+
++ NimbleTools 1.2 /Users/username/Documents/nimbletools
+
+3. Find the Maya executable package and right-click "Show Package
+   Contents". By default the packag is located here:
+   /Applications/Maya2008/Maya.app
+
+4. Once the contents are shown, create a 'modules' directory in the
+   'Contents' folder.
+
+5. Copy NimbleTools.txt into this modules directory.

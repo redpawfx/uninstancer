@@ -1,0 +1,421 @@
+// The MIT License
+//	
+// Copyright (c) 2009 James Piechota
+//	
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.	
+
+proc loadOptionVars()
+{
+	string $bakeType = `optionVar -q nsUninstancerBakeTypeOption`;
+	optionMenuGrp -e -value $bakeType nsUninstancerBakeTypeMenu;
+
+	string $timeRange = `optionVar -q nsUninstancerTimeRangeOption`;
+	optionMenuGrp -e -value $timeRange nsUninstancerTimeRangeMenu;
+
+	int $startFrame = `optionVar -q nsUninstancerStartFrameOption`;
+	intFieldGrp -e -value1 $startFrame nsUninstancerStartFrameField;
+
+	int $endFrame = `optionVar -q nsUninstancerEndFrameOption`;
+	intField -e -value $endFrame nsUninstancerEndFrameField;
+
+	int $frameStep = `optionVar -q nsUninstancerFrameStepOption`;
+	intSliderGrp -e -value $frameStep nsUninstancerFrameStepField;
+
+	int $copyAsInstance = `optionVar -q nsUninstancerCopyAsInstanceOption`;
+	checkBoxGrp -e -value1 $copyAsInstance nsUninstancerCopyAsInstanceCheck;
+}
+
+proc resetOptionVars(int $forceFactorySettings)
+{
+    //  Use timeline
+    //
+	if ($forceFactorySettings || !`optionVar -exists nsUninstancerBakeTypeOption`) {
+		optionVar -stringValue nsUninstancerBakeTypeOption "Geometry";
+    }
+
+	if ($forceFactorySettings || !`optionVar -exists nsUninstancerStartFrameOption`) {
+        optionVar -intValue nsUninstancerStartFrameOption 1;
+    }
+
+	if ($forceFactorySettings || !`optionVar -exists nsUninstancerEndFrameOption`) {
+        optionVar -intValue nsUninstancerEndFrameOption 10;
+    }
+
+	if ($forceFactorySettings || !`optionVar -exists nsUninstancerFrameStepOption`) {
+        optionVar -intValue nsUninstancerFrameStepOption 1;
+    }
+
+	if ($forceFactorySettings || !`optionVar -exists nsUninstancerTimeRangeOption`) {
+		optionVar -stringValue nsUninstancerTimeRangeOption "Current Frame";
+	}
+
+	if ($forceFactorySettings || !`optionVar -exists nsUninstancerCopyAsInstanceOption`) {
+		optionVar -intValue nsUninstancerCopyAsInstanceOption 0;
+	}
+}
+
+global proc nsUninstancerCallback( string $parent, string $instancer )
+{
+	setParent $parent;
+
+	string $bakeType = `optionMenuGrp -q -value nsUninstancerBakeTypeMenu`;
+	optionVar -stringValue nsUninstancerBakeTypeOption $bakeType;
+
+	string $timeRange = `optionMenuGrp -q -value nsUninstancerTimeRangeMenu`;
+	optionVar -stringValue nsUninstancerTimeRangeOption $timeRange;
+
+	int $startFrame = `intFieldGrp -q -value1 nsUninstancerStartFrameField`;
+	optionVar -intValue nsUninstancerStartFrameOption $startFrame;
+
+	int $endFrame = `intField -q -value nsUninstancerEndFrameField`;
+	optionVar -intValue nsUninstancerEndFrameOption $endFrame;
+
+	int $frameStep = `intSliderGrp -q -value nsUninstancerFrameStepField`;
+	optionVar -intValue nsUninstancerFrameStepOption $frameStep;
+
+	int $copyAsInstance = `checkBoxGrp -q -value1 nsUninstancerCopyAsInstanceCheck`;
+	optionVar -intValue nsUninstancerCopyAsInstanceOption $copyAsInstance;
+
+	nsPerformUninstancer( 0, $instancer );
+}
+
+global proc nsUninstancerHideWidgets()
+{
+	int $timeRangeVisible = ( "Manual" == `optionMenuGrp -q -value nsUninstancerTimeRangeMenu` );
+	intFieldGrp -e -enable $timeRangeVisible nsUninstancerStartFrameField;
+	intField -e -enable $timeRangeVisible nsUninstancerEndFrameField;
+	text -e -enable $timeRangeVisible nsUninstancerEndFrameLabel;
+}
+
+proc nsUninstancerOptions( string $instancer )
+{
+	resetOptionVars( false );
+
+	//	Get the option box.
+	//
+	//  The value returned is the name of the layout to be used as
+	//	the parent for the option box UI.
+	//
+	string $layout = getOptionBox();
+	setParent $layout;
+	
+	//	Activate the default UI template so that the layout of this 
+	//	option box is consistent with the layout of the rest of the 
+	//	application.
+	//
+	setUITemplate -pushTemplate DefaultTemplate;
+
+	//	Turn on the wait cursor.
+	//
+	waitCursor -state 1;
+
+	//	RECOMMENDATION:  Place the UI in a scroll layout.  If the 
+	//	option box window is ever resized such that it's entire 
+	//	contents is not visible then the scroll bars provided by the
+	//	scroll layout will allow the user to access the hidden UI.
+	//
+	tabLayout -tv false -scr true;
+	
+	string $parent = `columnLayout -adjustableColumn true`;
+
+	string $form = `formLayout -numberOfDivisions 100`;
+
+ 	optionMenuGrp
+		-label "Bake Type"
+		-changeCommand "nsUninstancerHideWidgets"
+		-adjustableColumn 2
+		nsUninstancerBakeTypeMenu;
+ 	menuItem -label "Geometry";
+ 	menuItem -label "Animation";
+ 	optionMenuGrp
+		-label "Time Range"
+		-changeCommand "nsUninstancerHideWidgets"
+		-adjustableColumn 2
+		nsUninstancerTimeRangeMenu;
+ 	menuItem -label "Current Frame";
+ 	menuItem -label "Timeline";
+ 	menuItem -label "Manual";
+ 	
+	checkBoxGrp
+		-label "Copy As Instance"
+		-columnWidth 2 20
+		nsUninstancerCopyAsInstanceCheck;
+
+	intFieldGrp
+		-numberOfFields 1
+	    -label "Start"
+	    -columnWidth 2 50
+		nsUninstancerStartFrameField;
+	text -label "End" nsUninstancerEndFrameLabel;
+	intField -width 50 nsUninstancerEndFrameField;
+	intSliderGrp
+		-label "Frame Step"
+		-minValue 1
+		-maxValue 24
+		-fieldMaxValue 10000
+		-adjustableColumn 3
+		nsUninstancerFrameStepField;
+	
+	formLayout -edit
+ 		-attachForm		nsUninstancerBakeTypeMenu			"top"		5
+ 		-attachForm		nsUninstancerBakeTypeMenu			"left"		5
+ 		-attachNone		nsUninstancerBakeTypeMenu			"right"
+
+		-attachControl	nsUninstancerCopyAsInstanceCheck		"top"		5 nsUninstancerBakeTypeMenu
+ 		-attachForm		nsUninstancerCopyAsInstanceCheck		"left"		5
+		-attachNone		nsUninstancerCopyAsInstanceCheck		"bottom"
+
+		-attachControl	nsUninstancerTimeRangeMenu			"top"		5 nsUninstancerCopyAsInstanceCheck
+ 		-attachForm		nsUninstancerTimeRangeMenu			"left"		5
+		-attachNone		nsUninstancerTimeRangeMenu			"bottom"
+
+		-attachControl	nsUninstancerStartFrameField		"top"		5 nsUninstancerTimeRangeMenu
+ 		-attachForm		nsUninstancerStartFrameField		"left"		5
+ 		-attachNone		nsUninstancerStartFrameField		"bottom"
+
+		-attachControl	nsUninstancerEndFrameLabel			"top"		5 nsUninstancerTimeRangeMenu
+ 		-attachControl	nsUninstancerEndFrameLabel			"left"		5 nsUninstancerStartFrameField
+ 		-attachNone		nsUninstancerEndFrameLabel			"bottom"
+
+		-attachControl	nsUninstancerEndFrameField			"top"		5 nsUninstancerTimeRangeMenu
+ 		-attachControl	nsUninstancerEndFrameField			"left"		5 nsUninstancerEndFrameLabel
+ 		-attachNone		nsUninstancerEndFrameField			"bottom"
+
+		-attachControl	nsUninstancerFrameStepField			"top"		5 nsUninstancerStartFrameField
+ 		-attachForm		nsUninstancerFrameStepField			"left"		5
+ 		-attachNone		nsUninstancerFrameStepField			"bottom"
+		-attachNone		nsUninstancerFrameStepField			"right"	
+
+ 	$form;
+
+	loadOptionVars();
+	nsUninstancerHideWidgets();
+
+	//	Turn off the wait cursor.
+	//
+	waitCursor -state 0;
+	
+	//	Deactivate the default UI template.
+	//
+	setUITemplate -popTemplate;
+
+	//	Attach actions to those buttons that are applicable to the option
+	//	box.  Note that the 'Close' button has a default action attached 
+	//	to it that will hide the window.  If a a custom action is
+	//	attached to the 'Close' button then be sure to call the 'hide the
+	//	option box' procedure within the custom action so that the option
+	//	box is hidden properly.
+
+	//	'Apply' button.
+	//
+	string $applyBtn = getOptionBoxApplyBtn();
+	button -edit
+		-label "Uninstance"
+		-command ("nsUninstancerCallback( \"" + $parent + "\", \"" + $instancer + "\" )")
+		$applyBtn;
+
+	//	'Save' button.
+	//
+	string $saveBtn = getOptionBoxSaveBtn();
+	button -edit 
+		-command ("hideOptionBox")
+		$saveBtn;
+
+	//	'Reset' button.
+	//
+	string $resetBtn = getOptionBoxResetBtn();
+	button -edit 
+		-command ("nsPerformUninstancer(3, \"" + $instancer + "\")")
+		$resetBtn;
+
+	//	Set the option box title.
+	//
+	setOptionBoxTitle("Uninstancer Options");
+
+	//	Show the option box.
+	//
+	showOptionBox();
+}
+
+proc string assembleCmd( string $instancer )
+{
+	string $cmd = "nsUninstancer";
+
+	string $selection[] = `ls -sl`;
+
+	if ( `size $selection` == 0 )
+	{
+		error ("Please select a single particle instancer, single particle system, or some number of individual particles.");
+	}
+
+	// If the $instancer parameter is empty, one or more instancers
+	// node must be selected.
+	//
+	if ( "" == $instancer && `size $selection` > 0 )
+	{
+		string $node;
+		for ( $node in $selection )
+		{
+			if ( `nodeType $node` != "instancer" )
+			{
+				error "Please select one or more particle instancers.";
+			}
+		}
+	}
+
+	// More than one item is selected. If it's simply multiple
+	// particles from the same particle system we're good - if,
+	// however, the user has selected multiple particle systems
+	// bail.
+	//
+	if ( "" != $instancer )
+	{
+		string $objects[] = `ls -sl -objectsOnly`;
+		string $oneAndOnlyObject = "";
+		string $curObject;
+		for ( $curObject in $objects )
+		{
+			if ( "" == $oneAndOnlyObject )
+			{
+				$oneAndOnlyObject = $curObject;
+			}
+			else
+			{
+				if ( $oneAndOnlyObject != $curObject )
+				{
+					error "Please select either particle instancers or particles. When selection particles, all must belong to the same particle system.";
+				}
+			}
+		}
+
+		// All's looking good. If the user has selected the transform above a
+		// particle system, replace it with the particle system. For simplicity
+		// ignore anything in the selection list that is not a transform above
+		// a particle system. That error checking will be handled by the
+		// command itself.
+		//
+		int $i = 0;
+		for ( $i = 0; $i < `size $selection`; $i++ )
+		{
+			string $particleShape = nsGetSelectedShape( $selection[$i], "particle" );
+			if ( "" != $particleShape )
+			{
+				$selection[$i] = $particleShape;
+			}
+		}
+
+		$cmd += (" -instancer " + $instancer);
+	}
+
+	string $bakeType = `optionVar -q nsUninstancerBakeTypeOption`;
+	$bakeType = `tolower $bakeType`;
+	$cmd += (" -bakeType \"" + $bakeType + "\"");
+
+	string $timeRange = `optionVar -q nsUninstancerTimeRangeOption`;
+	if ( "Manual" == $timeRange )
+	{
+		int $startFrame = `optionVar -q nsUninstancerStartFrameOption`;
+		int $endFrame = `optionVar -q nsUninstancerEndFrameOption`;
+		$cmd += (" -startFrame " + $startFrame + " -endFrame " + $endFrame);
+	}
+	else if ( "Timeline" == $timeRange )
+	{
+		int $startFrame = `playbackOptions -q -minTime`;
+		int $endFrame = `playbackOptions -q -maxTime`;
+		$cmd += (" -startFrame " + $startFrame + " -endFrame " + $endFrame);
+	}
+	int $frameStep = `optionVar -q nsUninstancerFrameStepOption`;
+	$cmd += (" -frameStep " + $frameStep);
+
+	int $copyAsInstance = `optionVar -q nsUninstancerCopyAsInstanceOption`;
+	$cmd += (" -copyAsInstance " + $copyAsInstance);
+
+	if ( "" == $instancer )
+	{
+		// One or more instancers selected.
+		//
+		string $cmdBase = $cmd;
+		$cmd = "";
+		string $target;
+		for ( $target in $selection )
+		{
+			$cmd += ($cmdBase + " " + $target + "; ");
+		}
+	}
+	else
+	{
+		// Particles selected.
+		//
+		$cmd += (" " + `stringArrayToString $selection " "`);
+	}
+
+	return $cmd;
+}
+
+global proc string nsPerformUninstancer( int $action,
+										 string $instancer )
+{
+	string $cmd = "";
+
+	switch ($action) {
+
+		//  Execute the command.
+		//
+		case 0:
+			//  Retrieve the option settings
+			//
+			resetOptionVars(false);
+
+			//  Get the command.
+			//
+			$cmd = `assembleCmd $instancer`;
+
+			//  Execute the command with the option settings.
+			//
+			evalEcho($cmd);
+
+			break;
+
+		//  Show the option box.
+		//
+		case 1:
+			nsUninstancerOptions( $instancer );
+			break;
+
+		//  Return the command string.
+		//
+		case 2:
+			//  Retrieve the option settings.
+			//
+			resetOptionVars (false);
+
+			//  Get the command.
+			//
+			$cmd = `assembleCmd $instancer`;
+			break;
+
+		// Reset
+		//
+		case 3:
+			resetOptionVars( true );
+			loadOptionVars();
+			break;
+	}
+	return $cmd;
+}

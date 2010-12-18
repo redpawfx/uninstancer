@@ -1,0 +1,212 @@
+// The MIT License
+//	
+// Copyright (c) 2009 James Piechota
+//	
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.	
+
+
+global int $nsUninstancerMMCallbackAdded = false;
+
+global proc aboutNimbleStudios()
+{
+	// Get the dialog's formLayout.
+ 	//
+ 	string $form = `setParent -q`;
+
+ 	// layoutDialog's are not resizable, so hard code a size here,
+ 	// to make sure all UI elements are visible.
+ 	//
+ 	formLayout -e -width 310 $form;
+
+
+	string $installPath = `getenv "NIMBLE_TOOLS_INSTALL"`;
+ 	string $logo = `image -width 300 -height 98 -image ($installPath + "/icons/NimbleStudiosLogo.jpg")`;
+
+	string $versionNumber = `pluginInfo -q -version NimbleTools`;
+ 	string $version = `text -align "center" -font "plainLabelFont" -label ("Nimble Tools " + $versionNumber)`;
+  	string $copyright = `text -align "center" -font "plainLabelFont" -label "Copyright (C) 2008 James Piechota"`;
+ 	string $email = `text -align "center" -font "boldLabelFont" -label "james@NimbleStudiosInc.com"`;
+ 	string $web = `text -align "center" -font "boldLabelFont" -label "www.NimbleStudiosInc.com"`;
+	string $sep1 = `separator`;
+	string $tag1 = `text -align "center" -font "plainLabelFont" -label "Pipeline Consulting"`;
+ 	string $tag2 = `text -align "center" -font "plainLabelFont" -label "Custom Maya plugins, shaders, and MEL scripts."`;
+	string $sep2 = `separator`;
+	//Commented out until the Hyperveil is ported to Python
+	//string $sep3 = `separator`;
+	//string $tag3a = `text -align "left" -font "plainLabelFont" -label "HyperVeil icon design by Tae Hee Lim"`;
+	//string $tag3b = `text -align "right" -font "boldLabelFont" -label "raonpop.com"`;
+	//string $sep4 = `separator`;
+	string $ok = `button -l "Ok" -c "layoutDialog -dismiss \"\""`;
+
+ 	int $spacer = 0;
+ 	int $top = 5;
+ 	int $edge = 5;
+
+ 	formLayout -edit
+		-attachForm			$logo 		"top"		$top
+		-attachForm			$logo 		"left"		$edge
+		-attachNone			$logo 		"bottom"
+		-attachForm			$logo 		"right"		$edge
+
+		//-attachForm			$version	"top"		$top
+		-attachControl		$version 	"top"		5		$logo
+		-attachForm			$version 	"left"		$edge
+		-attachNone			$version 	"bottom"
+		-attachForm			$version 	"right"		$edge
+
+		-attachControl		$copyright 	"top"		0		$version
+		-attachForm			$copyright 	"left"		$edge
+		-attachNone			$copyright 	"bottom"
+		-attachForm			$copyright 	"right"		$edge
+
+		-attachControl		$email 	"top"			20		$copyright
+		-attachForm			$email 	"left"			$edge
+		-attachNone			$email 	"bottom"
+		-attachForm			$email 	"right"			$edge
+
+		-attachControl		$web 		"top"		0		$email
+		-attachForm			$web 		"left"		$edge
+		-attachNone			$web 		"bottom"
+		-attachForm			$web 		"right"		$edge
+
+		-attachControl		$sep1 		"top"		5		$web
+		-attachForm			$sep1 		"left"		$edge
+		-attachNone			$sep1 		"bottom"
+		-attachForm			$sep1 		"right"		$edge
+
+		-attachControl		$tag1 		"top"		5		$sep1
+		-attachForm			$tag1 		"left"		$edge
+		-attachNone			$tag1 		"bottom"
+		-attachForm			$tag1 		"right"		$edge
+
+		-attachControl		$tag2 		"top"		0		$tag1
+		-attachForm			$tag2 		"left"		$edge
+		-attachNone			$tag2 		"bottom"
+		-attachForm			$tag2 		"right"		$edge
+
+		-attachControl		$sep2 		"top"		5		$tag2
+		-attachForm			$sep2 		"left"		$edge
+		-attachNone			$sep2 		"bottom"
+		-attachForm			$sep2 		"right"		$edge
+
+		//-attachControl		$sep3 		"top"		5		$sep2
+		//-attachForm			$sep3 		"left"		$edge
+		//-attachNone			$sep3 		"bottom"
+		//-attachForm			$sep3 		"right"		$edge
+
+		//-attachControl		$tag3a 		"top"		5		$sep3
+		//-attachForm			$tag3a 		"left"		$edge
+		//-attachNone			$tag3a 		"bottom"
+		//-attachNone			$tag3a 		"right"
+
+		//-attachControl		$tag3b 		"top"		5		$sep3
+		//-attachControl		$tag3b 		"left"		0		$tag3a
+		//-attachNone			$tag3b 		"bottom"
+		//-attachForm			$tag3b 		"right"		$edge
+
+		//-attachControl		$sep4 		"top"		5		$tag3a
+		//-attachForm			$sep4 		"left"		$edge
+		//-attachNone			$sep4 		"bottom"
+		//-attachForm			$sep4 		"right"		$edge
+
+		//-attachControl		$ok 		"top"		20		$sep4
+		-attachControl		$ok 		"top"		20		$sep2
+		-attachForm			$ok 		"left"		$edge
+		-attachNone			$ok 		"bottom"
+		-attachForm			$ok 		"right"		$edge
+  	$form;
+}
+
+global proc nsNimbleToolsCreateUI()
+{
+	global int $nsUninstancerMMCallbackAdded;
+
+	nsNimbleToolsLoadProcs();
+
+	if ( `menu -q -exists nsNimbleMenu` )
+	{
+		deleteUI nsNimbleMenu;
+	}
+
+	if ( `exists nsAddDagMMCallback` && !$nsUninstancerMMCallbackAdded )
+	{
+		nsAddDagMMCallback("nsUninstancerMM");
+		$nsUninstancerMMCallbackAdded = true;
+	}
+
+	menu -p MayaWindow -label "Nimble" -tearOff true -allowOptionBoxes true nsNimbleMenu;
+	menuItem
+		-l "Uninstance"
+		-ann "Uninstance: Bake particle instancer geometry/animation"
+		-c "nsPerformUninstancer( 0, \"\" )"
+		nsUninstanceMenuItem;
+	menuItem -optionBox true
+		-l "Uninstance Option Box"
+		-ann "Uninstance Option Box"
+		-c "nsPerformUninstancer( 1, \"\" )"
+		nsUninstanceOptions;
+
+	/*
+	menuItem -divider true;
+
+	menuItem
+		-l "Create Veil"
+		-ann "Create Veil: Create a hyperVeil to hide nodes in the HyperGraph and HyperShade"
+		-c "nsPerformCreateHyperVeil( 0 )"
+		nsCreateVeilItem;
+	menuItem -optionBox true
+		-l "Create Veil Option Box"
+		-ann "Create Veil Option Box"
+		-c "nsPerformCreateHyperVeil( 1 )"
+		nsCreateVeilOptions;
+	menuItem
+		-l "Add To Veil"
+		-ann "Add To Veil: Add the selected nodes to the selected hyperVeil (select nodes then hyperVeil)"
+		-c "nsHyperVeilAddSelectionToVeil"
+		nsAddToVeilItem;
+	menuItem
+		-l "Remove From Veil"
+		-ann "Remove From Veil: Remove the selected nodes from their respective hyperVeils"
+		-c "nsHyperVeilRemoveSelectionFromVeil"
+		nsRemoveFromVeilItem;
+
+	menuItem
+		-l "Edit Veil Interface"
+		-ann "Edit Veil Interface: Change which attributes are exposed in the hyperVeil attribute editor"
+		-c "nsHyperVeilEditInterface"
+		nsEditVeilInterfaceItem;
+	menuItem
+		-l "Show Veiled Nodes"
+		-ann "Show Veiled Nodes: Show all nodes associated with the selected hyperVeil(s)"
+		-c "nsHyperVeilShowSelected"
+		nsShowVeilItem;
+	menuItem
+		-l "Hide Veiled Nodes"
+		-ann "Hide Veiled Nodes: Hide all nodes associated with the selected hyperVeil(s)"
+		-c "nsHyperVeilHideSelected"
+		nsHideVeilItem;
+	*/
+	menuItem -divider true;
+
+	menuItem -label "About" -c "layoutDialog -ui aboutNimbleStudios";
+
+	// Make sure all the open editors are updated when the plugin is loaded
+	//
+	//nsHyperVeilInitEditors();
+}

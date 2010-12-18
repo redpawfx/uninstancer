@@ -1,0 +1,75 @@
+// The MIT License
+//	
+// Copyright (c) 2009 James Piechota
+//	
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.	
+
+global proc nsUninstancerMM( string $parent, string $object )
+{
+	if ( `pluginInfo -q -loaded NimbleTools` )
+	{
+		string $shape =  nsGetSelectedShape( $object, "particle" );
+		// Only show the menu if the user is over a particle.
+		//
+		if ( "" != $shape )
+		{
+			string $instancers[] = `listConnections ($shape + ".instanceData")`;
+
+			// Only show the Uninstance menu if there are instancers to
+			// uninstance.
+			//
+			if ( `size $instancers` > 0 )
+			{
+				menuItem
+					-l "Uninstance"
+					-ann "Uninstance: Bake particle instancer geometry/animation"
+					-allowOptionBoxes true
+					-subMenu true
+					nsUninstanceMenuItemMM;
+
+				menuItem
+					-l "All"
+					-ann "Uninstance all associated particle instancers"
+					-c ("nsUninstanceAllOnParticle( \"" + $shape + "\" )")
+					nsUninstanceAllInstancersMM;
+				menuItem -divider true;
+				
+				string $instancer;
+				for ( $instancer in $instancers )
+				{
+					menuItem
+						-l $instancer
+						-ann ("Uninstance " + $instancer)
+						-c ("nsPerformUninstancer( 0, \"" + $instancer + "\" )")
+						("nsUninstance" + $instancer + "MM");
+					menuItem
+						-optionBox true
+						-l "Uninstance Option Box"
+						-ann "Uninstance Option Box"
+						-c ("nsPerformUninstancer( 1, \""+ $instancer + "\" )")
+						("nsUninstance" + $instancer + "OptionsMM");
+				}
+
+				setParent -m ..;
+				menuItem -divider true;
+				setParent -m $parent;
+			}
+		}
+	}
+}

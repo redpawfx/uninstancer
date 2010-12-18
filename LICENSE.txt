@@ -1,0 +1,22 @@
+Copyright (c) 2008 Nimble Studios Inc.
+
+www.NimbleStudiosInc.com
+
+THE ACCOMPANYING PROGRAM IS PROVIDED UNDER THE TERMS OF THIS LICENSE AGREEMENT.
+ANY USE OF THE PROGRAM CONSTITUTES RECIPIENT'S ACCEPTANCE OF THIS LICENSE
+AGREEMENT.
+
+You are hereby granted a perpetual, non-exclusive, nontransferable license
+(without the right to grant sublicenses) to the software and associated
+documentation files (the "Software") for your own use and subject to the
+following conditions:
+
+1.	You may modify or reverse engineer the Software for your own use.
+2.	Neither the Software nor any derivative works may be redistributed.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+NIMBLE STUDIOS INC. BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

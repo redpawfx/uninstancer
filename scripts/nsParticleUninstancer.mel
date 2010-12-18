@@ -1,0 +1,92 @@
+// The MIT License
+//	
+// Copyright (c) 2009 James Piechota
+//	
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.	
+
+
+//particleInstancer -name instancer1  -q -position particleShape1;
+proc float[] getPositions( string $instancer, string $particleShape )
+{
+	string $positionAttr = `particleInstancer -name $instancer -q -position $particleShape`;
+	if ( "" == $positionAttr )
+	{
+		$positionAttr = "worldPosition";
+	}
+	return `getParticleAttr -array true -attribute $positionAttr $particleShape`;
+}
+
+proc float[] getScales( string $instancer, string $particleShape )
+{
+	string $scaleAttr = `particleInstancer -name $instancer -q -scale $particleShape`;
+	if ( "" == $scaleAttr )
+	{
+		return {};
+	}
+	return `getParticleAttr -array true -attribute $scaleAttr $particleShape`;
+}
+
+proc float[] getRotations( string $instancer, string $particleShape )
+{
+	string $rotationAttr = `particleInstancer -name $instancer -q -rotation $particleShape`;
+	if ( "" == $rotationAttr )
+	{
+		return {};
+	}
+	return `getParticleAttr -array true -attribute $rotationAttr $particleShape`;
+}
+
+global proc nsParticleUninstancer()
+{
+	string $selection[] = `ls -sl`;
+	if ( 0 == size($selection) )
+	{
+		error("nsParticleUninstancer: Please select a particle instancer.");
+	}
+
+	// Get the selected instancer
+	//
+	string $instancer = $selection[0];
+	if ( `objectType $instancer` != "instancer" )
+	{
+		error("nsParticleUninstancer: " + $instancer + " is not a particle instancer.");
+	}
+	if ( size($selection) > 1 )
+	{
+		warning("nsParticleUninstancer: Multiple objects selected ignoring all but the first: " + $instancer + ".");
+	}
+
+	// Find its associated particle shape
+	//
+	string $ret[] = `listConnections -shapes true ($instancer + ".inputPoints")`;
+	if ( 0 == size($ret) || `objectType $ret[0]` != "particle" )
+	{
+		error("nsParticleUninstancer: " + $instancer + " is not connected to a particle shape.");
+	}
+	string $particleShape = $ret[0];
+
+	float $positions[] = getPositions( $instancer, $particleShape );
+	float $scales[] = getScales( $instancer, $particleShape );
+	float $rotations[] = getRotations( $instancer, $particleShape );
+	print(size($positions) + "\n");
+	print(size($scales) + "\n");
+	print(size($rotations) + "\n");
+	//print($positions);
+
+}

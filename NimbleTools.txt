@@ -1,0 +1,1 @@
++ NimbleTools 1.2 PATH_TO_INSTALL_DIRECTORY
