@@ -27,9 +27,9 @@ import ns.maya.Errors
 
 def framesPerSecond():
 	timestep = MTime( 1, MTime.kSeconds )
-	return timestep.as( MTime.uiUnit() )
+	return timestep.asUnits( MTime.uiUnit() )
 
 def secondsPerFrame():
 	timestep = MTime( 1, MTime.uiUnit() )
-	return timestep.as( MTime.kSeconds )
+	return timestep.asUnits( MTime.kSeconds )
 
